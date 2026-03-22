@@ -4,15 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { register } from '@/lib/api'
-import { UserPlus, Home } from 'lucide-react'
+import { UserPlus, Home, ArrowLeft } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
-    role: 'MEMBER'
+    name: '',
+    familyName: ''
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -23,8 +23,11 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(formData)
-      router.push('/login')
+      const data = await register(formData)
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('refreshToken', data.refreshToken)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      router.push('/dashboard')
     } catch (err) {
       setError(err.response?.data?.error || 'Errore durante la registrazione')
     } finally {
@@ -33,78 +36,90 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 px-4 relative overflow-hidden">
+      {/* Effetti decorativi */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
+      <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-pulse"></div>
+
+      <div className="max-w-md w-full bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/20 relative z-10">
+        <Link href="/" className="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          <span className="text-sm">Torna alla home</span>
+        </Link>
+
         <div className="flex items-center justify-center mb-8">
-          <Home className="w-12 h-12 text-indigo-600 mr-3" />
-          <h1 className="text-3xl font-bold text-gray-900">Casa Mia</h1>
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-4 rounded-2xl shadow-lg">
+            <Home className="w-10 h-10 text-white" />
+          </div>
         </div>
         
-        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Registrati</h2>
+        <h1 className="text-3xl font-bold text-center mb-2 text-white">Crea Account</h1>
+        <p className="text-center text-white/80 mb-8">Inizia a gestire la tua casa intelligente</p>
         
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+          <div className="bg-red-500/20 border border-red-300 text-white px-4 py-3 rounded-xl mb-6 backdrop-blur-sm">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+            <label className="block text-sm font-medium text-white mb-2">Nome completo</label>
             <input
               type="text"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Il tuo nome"
+              className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white/60 backdrop-blur-sm"
+              placeholder="Mario Rossi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="block text-sm font-medium text-white mb-2">Email</label>
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white/60 backdrop-blur-sm"
               placeholder="tua@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-white mb-2">Password</label>
             <input
               type="password"
               required
               minLength={6}
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white/60 backdrop-blur-sm"
               placeholder="••••••••"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Ruolo</label>
-            <select
-              value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            >
-              <option value="MEMBER">Membro</option>
-              <option value="ADMIN">Admin</option>
-            </select>
+            <label className="block text-sm font-medium text-white mb-2">Nome famiglia</label>
+            <input
+              type="text"
+              required
+              value={formData.familyName}
+              onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
+              className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-xl focus:ring-2 focus:ring-white focus:border-transparent text-white placeholder-white/60 backdrop-blur-sm"
+              placeholder="Famiglia Rossi"
+            />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="w-full bg-white text-indigo-600 py-3 rounded-xl font-semibold hover:bg-white/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
           >
             {loading ? (
-              <span>Caricamento...</span>
+              <span>Creazione account...</span>
             ) : (
               <>
                 <UserPlus className="w-5 h-5 mr-2" />
@@ -114,9 +129,9 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <p className="text-center mt-6 text-gray-600">
+        <p className="text-center mt-6 text-white/80">
           Hai già un account?{' '}
-          <Link href="/login" className="text-indigo-600 font-semibold hover:underline">
+          <Link href="/login" className="text-white font-semibold hover:underline">
             Accedi
           </Link>
         </p>
