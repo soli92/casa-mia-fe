@@ -1,140 +1,121 @@
 'use client'
 import Link from 'next/link'
-import { ShoppingCart, Package, ChefHat, Calendar, Wifi, LogIn, Sparkles } from 'lucide-react'
+import { ShoppingCart, Package, ChefHat, Calendar, Wifi, Home, ArrowRight } from 'lucide-react'
 
 export default function HomePage() {
-  const features = [
-    {
-      icon: <ShoppingCart className="w-8 h-8" />,
-      title: "Lista della Spesa",
-      description: "Organizza i tuoi acquisti con categorie intelligenti",
-      href: "/login",
-      gradient: "from-green-400 to-emerald-600",
-      iconBg: "bg-green-500"
-    },
-    {
-      icon: <Package className="w-8 h-8" />,
-      title: "Dispensa Smart",
-      description: "Monitora le scadenze e non sprecare cibo",
-      href: "/login",
-      gradient: "from-orange-400 to-red-500",
-      iconBg: "bg-orange-500"
-    },
-    {
-      icon: <ChefHat className="w-8 h-8" />,
-      title: "Ricette Suggerite",
-      description: "Idee basate sui prodotti che hai in casa",
-      href: "/login",
-      gradient: "from-purple-400 to-pink-500",
-      iconBg: "bg-purple-500"
-    },
-    {
-      icon: <Calendar className="w-8 h-8" />,
-      title: "Calendario Scadenze",
-      description: "Non dimenticare mai più una bolletta",
-      href: "/login",
-      gradient: "from-blue-400 to-indigo-600",
-      iconBg: "bg-blue-500"
-    },
-    {
-      icon: <Wifi className="w-8 h-8" />,
-      title: "Hub IoT",
-      description: "Controlla i tuoi dispositivi smart in tempo reale",
-      href: "/login",
-      gradient: "from-cyan-400 to-blue-500",
-      iconBg: "bg-cyan-500"
-    }
-  ]
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-              <span className="text-2xl">🏠</span>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 relative overflow-hidden">
+      {/* Effetti decorativi */}
+      <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-10"></div>
+      <div className="absolute top-20 left-10 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <div className="flex items-center justify-center mb-6">
+            <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-6 shadow-2xl">
+              <Home className="w-16 h-16 text-white" />
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Casa Mia
-            </span>
           </div>
-          <Link 
-            href="/login"
-            className="flex items-center space-x-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-all hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <LogIn className="w-5 h-5" />
-            <span className="font-semibold">Accedi</span>
+          <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
+            🏠 Casa Mia
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 mb-8 font-light max-w-2xl mx-auto">
+            La tua casa intelligente, organizzata e connessa. Tutto sotto controllo in un'unica app.
+          </p>
+          <Link href="/login">
+            <button className="bg-white text-indigo-600 px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center mx-auto space-x-2">
+              <span>Inizia ora</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
           </Link>
         </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="text-center mb-16">
-          <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
-              <Sparkles className="w-4 h-4 text-yellow-500" />
-              <span className="text-sm font-semibold text-gray-700">La tua casa intelligente</span>
-            </div>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
-            Gestisci la tua casa
-            <br />
-            in modo intelligente
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10">
-            Tutto ciò che ti serve per organizzare spesa, dispensa, scadenze e dispositivi smart in un'unica app
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all hover:scale-105 shadow-2xl hover:shadow-3xl text-lg"
-            >
-              Inizia Gratis
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 font-bold rounded-xl hover:bg-gray-50 transition-all hover:scale-105 shadow-lg text-lg border-2 border-indigo-200"
-            >
-              Accedi
-            </Link>
-          </div>
+        
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card 
+            href="/login" 
+            icon={<ShoppingCart className="w-8 h-8" />} 
+            title="Lista Spesa" 
+            description="Gestisci i tuoi acquisti con categorie e storico"
+            gradient="from-green-400 to-green-600"
+          />
+          <Card 
+            href="/login" 
+            icon={<Package className="w-8 h-8" />} 
+            title="Dispensa Intelligente" 
+            description="Monitora le scadenze e non sprecare più cibo"
+            gradient="from-orange-400 to-orange-600"
+          />
+          <Card 
+            href="/login" 
+            icon={<ChefHat className="w-8 h-8" />} 
+            title="Ricette Suggerite" 
+            description="Ricette personalizzate in base a ciò che hai"
+            gradient="from-purple-400 to-purple-600"
+          />
+          <Card 
+            href="/login" 
+            icon={<Calendar className="w-8 h-8" />} 
+            title="Calendario Scadenze" 
+            description="Bollette, tasse e abbonamenti sempre sotto controllo"
+            gradient="from-red-400 to-red-600"
+          />
+          <Card 
+            href="/login" 
+            icon={<Wifi className="w-8 h-8" />} 
+            title="Hub IoT" 
+            description="Controlla dispositivi smart in tempo reale"
+            gradient="from-blue-400 to-blue-600"
+          />
+          <Card 
+            href="/register" 
+            icon={<Home className="w-8 h-8" />} 
+            title="Multi-famiglia" 
+            description="Condividi la gestione con tutta la famiglia"
+            gradient="from-pink-400 to-pink-600"
+          />
         </div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {features.map((feature, index) => (
-            <Link
-              key={index}
-              href={feature.href}
-              className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden hover:-translate-y-2"
-            >
-              <div className={`h-2 bg-gradient-to-r ${feature.gradient}`} />
-              <div className="p-8">
-                <div className={`${feature.iconBg} w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform shadow-lg`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </Link>
-          ))}
+        {/* Footer */}
+        <div className="mt-16 text-center text-white/80">
+          <p className="text-sm">Sviluppato con ❤️ da Soli AI Agent</p>
         </div>
-      </section>
+      </div>
 
-      {/* Footer */}
-      <footer className="bg-white/50 backdrop-blur-sm border-t border-gray-200 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-          <p className="text-gray-600">
-            © 2024 Casa Mia. Gestione domestica intelligente.
-          </p>
-        </div>
-      </footer>
+      <style jsx>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
+  )
+}
+
+function Card({ href, icon, title, description, gradient }) {
+  return (
+    <Link href={href}>
+      <div className="group relative bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-white/40 shadow-xl hover:shadow-2xl transform hover:-translate-y-2">
+        <div className={`bg-gradient-to-br ${gradient} w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+          {icon}
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+        <p className="text-white/80 text-sm leading-relaxed">{description}</p>
+      </div>
+    </Link>
   )
 }
