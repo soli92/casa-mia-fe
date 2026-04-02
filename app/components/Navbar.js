@@ -37,6 +37,7 @@ export default function Navbar() {
 
   const navItems = [
     { href: '/dashboard', icon: Home, label: 'Dashboard' },
+    { href: '/famiglia', icon: Users, label: 'Famiglia' },
     { href: '/lavagna', icon: StickyNote, label: 'Lavagna' },
     { href: '/shopping', icon: ShoppingCart, label: 'Spesa' },
     { href: '/pantry', icon: Package, label: 'Dispensa' },

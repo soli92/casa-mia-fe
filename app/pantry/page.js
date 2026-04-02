@@ -2,14 +2,16 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2, AlertTriangle, X, Package } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle, X, Package, ScanBarcode } from 'lucide-react'
 import { getPantry, createPantryItem, deletePantryItem } from '@/lib/api'
 import { LS_TOKEN_KEY } from '@/lib/authSession'
 import { format, differenceInDays, parseISO } from 'date-fns'
 import { it } from 'date-fns/locale'
 import Navbar from '../components/Navbar'
+import PantryBarcodeModal from '../components/PantryBarcodeModal'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
+import { fetchProductByBarcode } from '@/lib/openFoodFacts'
 
 const CATEGORIES = ['FRUTTA', 'VERDURA', 'CARNE', 'PESCE', 'LATTICINI', 'PANE', 'PASTA', 'BEVANDE', 'SNACK', 'ALTRO']
 
@@ -19,6 +21,7 @@ export default function PantryPage() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -48,6 +51,18 @@ export default function PantryPage() {
   }, [router, loadItems])
 
   useDataUpdateRefresh('pantry', loadItems)
+
+  const closeScanner = useCallback(() => setScanOpen(false), [])
+
+  const handleBarcodeScanned = useCallback(async (code) => {
+    const info = await fetchProductByBarcode(code)
+    setFormData((f) => ({
+      ...f,
+      name: info.name || f.name,
+      category: info.category || f.category,
+    }))
+    setShowForm(true)
+  }, [])
 
   const handleAdd = async (e) => {
     e.preventDefault()
@@ -108,20 +123,38 @@ export default function PantryPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
+      {scanOpen && (
+        <PantryBarcodeModal onClose={closeScanner} onScan={handleBarcodeScanned} />
+      )}
+
       <div className="app-main-shell">
-        <div className="flex justify-between items-center mb-8">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">Dispensa Smart 📦</h1>
             <p className="text-muted-foreground">Totale prodotti: {items.length}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Censimento rapido: scansiona il barcode con il telefono (Open Food Facts per il nome).
+            </p>
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center space-x-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg transition-all hover:scale-105 hover:opacity-95"
-          >
-            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            <span className="font-semibold">{showForm ? 'Annulla' : 'Aggiungi Prodotto'}</span>
-          </button>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setScanOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-background px-4 py-3 font-semibold text-primary shadow-md transition-all hover:bg-primary/10"
+            >
+              <ScanBarcode className="h-5 w-5 shrink-0" />
+              <span>Scansiona</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(!showForm)}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg transition-all hover:opacity-95"
+            >
+              {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              <span>{showForm ? 'Annulla' : 'Aggiungi'}</span>
+            </button>
+          </div>
         </div>
 
         {showForm && (

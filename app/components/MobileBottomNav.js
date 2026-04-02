@@ -10,10 +10,12 @@ import {
   Calendar,
   Wifi,
   StickyNote,
+  Users,
 } from 'lucide-react'
 
 const items = [
   { href: '/dashboard', icon: Home, label: 'Home' },
+  { href: '/famiglia', icon: Users, label: 'Famiglia' },
   { href: '/lavagna', icon: StickyNote, label: 'Lavagna' },
   { href: '/shopping', icon: ShoppingCart, label: 'Spesa' },
   { href: '/pantry', icon: Package, label: 'Dispensa' },

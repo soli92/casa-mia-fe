@@ -61,6 +61,13 @@ export default function DashboardPage() {
 
   const cards = [
     {
+      title: 'Famiglia',
+      description: 'Chi fa parte del nucleo: ruoli e contatti',
+      icon: Users,
+      href: '/famiglia',
+      gradient: 'from-teal-500 to-cyan-700',
+    },
+    {
       title: 'Lavagna familiare',
       description: 'Post-it condivisi: promemoria visibili a tutta la famiglia',
       icon: StickyNote,
