@@ -32,7 +32,13 @@ export default function RegisterPage() {
       router.push('/dashboard')
     } catch (err) {
       console.error('Errore registrazione:', err)
-      setError(err.response?.data?.error || 'Errore durante la registrazione')
+      const msg =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        (err.code === 'ERR_NETWORK' || err.message === 'Network Error'
+          ? 'Impossibile contattare il server. Controlla NEXT_PUBLIC_API_URL e CORS (FRONTEND_URL sul backend).'
+          : err.message)
+      setError(msg || 'Errore durante la registrazione')
     } finally {
       setLoading(false)
     }
