@@ -2,16 +2,22 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Trash2, AlertTriangle, X, Package, ScanBarcode } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle, X, Package, ScanBarcode, Camera, History } from 'lucide-react'
 import { getPantry, createPantryItem, deletePantryItem } from '@/lib/api'
 import { LS_TOKEN_KEY } from '@/lib/authSession'
 import { format, differenceInDays, parseISO } from 'date-fns'
 import { it } from 'date-fns/locale'
 import Navbar from '../components/Navbar'
 import PantryBarcodeModal from '../components/PantryBarcodeModal'
+import PantryOcrModal from '../components/PantryOcrModal'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
 import { fetchProductByBarcode } from '@/lib/openFoodFacts'
+import {
+  loadPantryScanHistory,
+  pushPantryScanHistory,
+  clearPantryScanHistory,
+} from '@/lib/pantryScanHistory'
 
 const CATEGORIES = ['FRUTTA', 'VERDURA', 'CARNE', 'PESCE', 'LATTICINI', 'PANE', 'PASTA', 'BEVANDE', 'SNACK', 'ALTRO']
 
@@ -22,6 +28,8 @@ export default function PantryPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
+  const [ocrOpen, setOcrOpen] = useState(false)
+  const [scanHistory, setScanHistory] = useState([])
   const [formData, setFormData] = useState({
     name: '',
     quantity: 1,
@@ -48,11 +56,13 @@ export default function PantryPage() {
       return
     }
     loadItems()
+    setScanHistory(loadPantryScanHistory())
   }, [router, loadItems])
 
   useDataUpdateRefresh('pantry', loadItems)
 
   const closeScanner = useCallback(() => setScanOpen(false), [])
+  const closeOcr = useCallback(() => setOcrOpen(false), [])
 
   const handleBarcodeScanned = useCallback(async (code) => {
     const info = await fetchProductByBarcode(code)
@@ -60,6 +70,42 @@ export default function PantryPage() {
       ...f,
       name: info.name || f.name,
       category: info.category || f.category,
+    }))
+    setScanHistory(
+      pushPantryScanHistory({
+        source: 'barcode',
+        name: info.name || `Barcode ${code}`,
+        category: info.category || 'ALTRO',
+        barcode: code,
+      })
+    )
+    setShowForm(true)
+  }, [])
+
+  const handleOcrResult = useCallback((payload) => {
+    setScanHistory(
+      pushPantryScanHistory({
+        source: 'ocr',
+        name: payload.name,
+        category: 'ALTRO',
+        expirationDate: payload.expirationDate || undefined,
+      })
+    )
+    setFormData((f) => ({
+      ...f,
+      name: payload.name || f.name,
+      category: 'ALTRO',
+      expirationDate: payload.expirationDate || f.expirationDate,
+    }))
+    setShowForm(true)
+  }, [])
+
+  const applyHistoryEntry = useCallback((row) => {
+    setFormData((f) => ({
+      ...f,
+      name: row.name || f.name,
+      category: row.category || f.category,
+      expirationDate: row.expirationDate || f.expirationDate,
     }))
     setShowForm(true)
   }, [])
@@ -127,6 +173,7 @@ export default function PantryPage() {
       {scanOpen && (
         <PantryBarcodeModal onClose={closeScanner} onScan={handleBarcodeScanned} />
       )}
+      {ocrOpen && <PantryOcrModal onClose={closeOcr} onResult={handleOcrResult} />}
 
       <div className="app-main-shell">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -134,7 +181,8 @@ export default function PantryPage() {
             <h1 className="text-4xl font-bold text-foreground mb-2">Dispensa Smart 📦</h1>
             <p className="text-muted-foreground">Totale prodotti: {items.length}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Censimento rapido: scansiona il barcode con il telefono (Open Food Facts per il nome).
+              Barcode (Open Food Facts) oppure foto etichetta (OCR sul telefono). Le ultime scansioni
+              restano salvate solo su questo dispositivo.
             </p>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -144,7 +192,15 @@ export default function PantryPage() {
               className="inline-flex items-center gap-2 rounded-xl border-2 border-primary bg-background px-4 py-3 font-semibold text-primary shadow-md transition-all hover:bg-primary/10"
             >
               <ScanBarcode className="h-5 w-5 shrink-0" />
-              <span>Scansiona</span>
+              <span>Barcode</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setOcrOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-3 font-semibold text-foreground shadow-md transition-all hover:bg-muted"
+            >
+              <Camera className="h-5 w-5 shrink-0" />
+              <span>Etichetta</span>
             </button>
             <button
               type="button"
@@ -156,6 +212,46 @@ export default function PantryPage() {
             </button>
           </div>
         </div>
+
+        {scanHistory.length > 0 && (
+          <section
+            className="mb-8 rounded-2xl border border-border bg-card/80 p-4 shadow-sm"
+            aria-label="Ultime scansioni"
+          >
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                <History className="h-4 w-4 text-muted-foreground" aria-hidden />
+                Ultime scansioni
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  clearPantryScanHistory()
+                  setScanHistory([])
+                }}
+                className="text-xs font-medium text-muted-foreground underline hover:text-foreground"
+              >
+                Svuota storico
+              </button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {scanHistory.map((row) => (
+                <button
+                  key={row.id}
+                  type="button"
+                  onClick={() => applyHistoryEntry(row)}
+                  className="flex min-w-[9rem] max-w-[11rem] shrink-0 flex-col rounded-xl border border-border bg-background px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-muted/50"
+                >
+                  <span className="truncate font-medium text-foreground">{row.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {row.source === 'barcode' ? 'Barcode' : 'OCR'}
+                    {row.expirationDate ? ` · ${row.expirationDate}` : ''}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {showForm && (
           <form onSubmit={handleAdd} className="bg-card rounded-2xl shadow-lg p-6 mb-8 border border-border">
