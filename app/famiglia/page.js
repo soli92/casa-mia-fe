@@ -1,9 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Users, Shield, UserCircle, ArrowLeft, UserPlus } from 'lucide-react'
+import { Users, Shield, UserCircle, ArrowLeft, UserPlus, Copy, Check } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { LS_TOKEN_KEY } from '@/lib/authSession'
 import { getFamilyMembers, addFamilyMember } from '@/lib/api'
@@ -13,7 +13,7 @@ import { it } from 'date-fns/locale'
 
 export default function FamigliaPage() {
   const router = useRouter()
-  const { user, hydrated } = useSession()
+  const { user, family, hydrated, refreshSession } = useSession()
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -21,6 +21,8 @@ export default function FamigliaPage() {
   const [addForm, setAddForm] = useState({ email: '', password: '', name: '' })
   const [addError, setAddError] = useState('')
   const [addBusy, setAddBusy] = useState(false)
+  const [copiedCode, setCopiedCode] = useState(false)
+  const inviteRefreshOnce = useRef(false)
 
   const load = useCallback(async () => {
     setLoadError('')
@@ -44,7 +46,27 @@ export default function FamigliaPage() {
     load()
   }, [router, load])
 
+  useEffect(() => {
+    if (!hydrated || user?.role !== 'ADMIN' || family?.inviteCode || inviteRefreshOnce.current) {
+      return
+    }
+    inviteRefreshOnce.current = true
+    refreshSession()
+  }, [hydrated, user?.role, family?.inviteCode, refreshSession])
+
   const isAdmin = user?.role === 'ADMIN'
+  const inviteCode = family?.inviteCode
+
+  const copyInviteCode = async () => {
+    if (!inviteCode || typeof navigator === 'undefined' || !navigator.clipboard) return
+    try {
+      await navigator.clipboard.writeText(inviteCode)
+      setCopiedCode(true)
+      setTimeout(() => setCopiedCode(false), 2000)
+    } catch {
+      /* ignore */
+    }
+  }
 
   const handleAddMember = async (e) => {
     e.preventDefault()
@@ -102,6 +124,41 @@ export default function FamigliaPage() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   Membri che condividono spesa, dispensa, lavagna e il resto dell’app.
                 </p>
+                {isAdmin && inviteCode && (
+                  <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Codice invito (condividilo con chi deve entrare in questa casa)
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <code className="rounded-lg bg-background px-3 py-2 font-mono text-lg font-semibold tracking-widest text-foreground">
+                        {inviteCode}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={copyInviteCode}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium hover:bg-muted"
+                      >
+                        {copiedCode ? (
+                          <>
+                            <Check className="h-4 w-4 text-green-600" />
+                            Copiato
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4" />
+                            Copia
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Chi si registra da solo con &quot;Registrati&quot; crea un’altra casa anche se
+                      il nome famiglia è uguale. Per vedere gli stessi dati serve questo codice su{' '}
+                      <strong className="text-foreground">Unisciti a una casa</strong> (/unisciti) o
+                      che tu aggiunga il membro qui sotto.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             {isAdmin && (

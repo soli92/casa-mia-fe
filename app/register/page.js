@@ -61,6 +61,21 @@ export default function RegisterPage() {
           Crea il tuo account
         </h2>
 
+        <div className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-foreground">
+          <p className="font-medium text-amber-900 dark:text-amber-100">
+            Stai entrando in una famiglia che esiste già?
+          </p>
+          <p className="mt-1 text-muted-foreground">
+            Non usare questa pagina: il <strong className="text-foreground">nome famiglia</strong>{' '}
+            è solo un&apos;etichetta — qui si crea sempre una <strong className="text-foreground">nuova</strong>{' '}
+            casa separata. Chiedi il codice invito e vai su{' '}
+            <Link href="/unisciti" className="font-semibold text-primary underline">
+              Unisciti a una casa
+            </Link>
+            .
+          </p>
+        </div>
+
         {error && (
           <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive">
             <p className="text-sm font-medium">{error}</p>
@@ -90,6 +105,10 @@ export default function RegisterPage() {
               className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Famiglia Rossi"
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Sarà il nome mostrato in app. Altri utenti non si uniscono ripetendo lo stesso nome: serve
+              il codice invito (pagina Unisciti) o un account creato dall&apos;admin in Famiglia.
+            </p>
           </div>
 
           <div>
@@ -141,6 +160,10 @@ export default function RegisterPage() {
           Hai già un account?{' '}
           <Link href="/login" className="font-semibold text-primary hover:underline">
             Accedi
+          </Link>
+          {' · '}
+          <Link href="/unisciti" className="font-semibold text-primary hover:underline">
+            Ho un codice invito
           </Link>
         </p>
       </div>

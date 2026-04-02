@@ -105,6 +105,10 @@ export default function LoginPage() {
           <Link href="/register" className="font-semibold text-primary hover:underline">
             Registrati
           </Link>
+          {' · '}
+          <Link href="/unisciti" className="font-semibold text-primary hover:underline">
+            Codice invito
+          </Link>
         </p>
       </div>
     </div>
