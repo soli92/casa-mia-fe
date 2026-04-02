@@ -117,21 +117,21 @@ export default function ShoppingPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="mb-2 flex items-center gap-2 text-4xl font-bold text-foreground">
-              <ShoppingCart className="h-9 w-9 text-primary" />
+      <div className="app-main-shell">
+        <div className="mb-6 flex flex-col justify-between gap-4 sm:mb-8 sm:flex-row sm:items-center">
+          <div className="min-w-0">
+            <h1 className="mb-1 flex items-center gap-2 text-2xl font-bold text-foreground sm:mb-2 sm:text-3xl">
+              <ShoppingCart className="h-8 w-8 shrink-0 text-primary sm:h-9 sm:w-9" />
               Lista spesa
             </h1>
-            <p className="text-muted-foreground">
-              {open.length} da comprare · {done.length} spuntati
+            <p className="text-sm text-muted-foreground sm:text-base">
+              Condivisa con la tua famiglia · {open.length} da comprare · {done.length} spuntati
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center space-x-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg transition-all hover:scale-[1.02] hover:opacity-95"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground shadow-md transition-all active:scale-[0.99] hover:opacity-95 sm:w-auto sm:min-h-10"
           >
             {showForm ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
             <span>{showForm ? 'Annulla' : 'Aggiungi'}</span>

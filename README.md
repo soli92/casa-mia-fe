@@ -8,9 +8,11 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 - 🥫 **Dispensa intelligente** con alert scadenze
 - 👨‍🍳 **Ricette suggerite** basate su cosa hai in casa
 - 📅 **Calendario scadenze** (bollette, abbonamenti, tasse)
+- 📝 **Lavagna** (`/lavagna`) — post-it condivisi con la famiglia, trascinamento, colori, sync WebSocket
 - 🏠 **Hub IoT** per controllare dispositivi smart home in tempo reale
 - 🔐 **Autenticazione sicura** con JWT + refresh token
-- 👨‍👩‍👧‍👦 **Multi-utente** - condividi la gestione con la famiglia
+- 👨‍👩‍👧‍👦 **Multi-utente** — stessi dati per tutta la famiglia; **navbar** con nome famiglia; admin può rinominare la famiglia dalla dashboard
+- 📱 **Mobile-first** — bottom nav scrollabile, **menu laterale** (drawer) su hamburger; toast realtime sotto la barra superiore (`z-index` non copre l’header)
 
 ## 🛠️ Tech Stack
 
@@ -44,32 +46,37 @@ Non sono previsti utenti demo: crea un account da **Registrati** (famiglia + pri
 
 ```
 app/
-├── dashboard/       # Home dashboard
-├── login/          # Login page
-├── register/       # Registrazione
-├── shopping/       # Lista spesa
-├── pantry/         # Gestione dispensa
-├── recipes/        # Ricette e suggerimenti
-├── deadlines/      # Scadenze e calendario
-├── iot/            # Hub IoT
-├── providers.jsx   # Theme + WebSocket context
-├── globals.css     # SoliDS + Tailwind
-└── page.js         # Landing page
+├── dashboard/       # Home + modifica nome famiglia (admin)
+├── lavagna/         # Lavagna post-it
+├── login/           # Login
+├── register/        # Registrazione
+├── shopping/        # Lista spesa
+├── pantry/          # Dispensa
+├── recipes/         # Ricette
+├── deadlines/       # Scadenze
+├── iot/             # Hub IoT
+├── components/
+│   ├── Navbar.js         # Titolo famiglia, drawer mobile, link desktop
+│   └── MobileBottomNav.js
+├── providers.jsx    # Theme → SessionProvider → WebSocket
+├── globals.css      # SoliDS + `.app-main-shell` (padding sopra bottom nav)
+└── page.js          # Landing
 
 components/
 └── ThemeProvider.jsx / ThemeToggle.jsx
 
 contexts/
-└── CasaMiaWebSocketContext.jsx  # WS, toast, sendFamilyUpdate
+├── SessionContext.jsx           # user + family, sync GET /auth/me, persistenza LS
+└── CasaMiaWebSocketContext.jsx  # WS, toast (z-46), sendFamilyUpdate, `board` in toast
 
 hooks/
-└── useDataUpdateRefresh.js      # refetch su evento data_update
+└── useDataUpdateRefresh.js
 
 lib/
-├── api.js          # Axios + interceptor JWT / refresh
-├── apiUrl.js       # Base URL API + URL WebSocket (`/ws`)
-├── authSession.js
-└── themeStorage.js # chiave `data-theme` (light | dark)
+├── api.js          # REST incluso board + PATCH family
+├── apiUrl.js
+├── authSession.js  # token, refresh, user, **family** (`persistSession`)
+└── themeStorage.js
 ```
 
 ## 🔧 Variabili d'ambiente
@@ -88,8 +95,9 @@ NEXT_PUBLIC_API_URL=https://casa-mia-be.onrender.com
 ## 🎨 UI/UX
 
 - **SoliDS**: variabili `--background`, `--foreground`, `--primary`, ecc.; `data-theme="light"` | `data-theme="dark"` su `<html>` (preferenza salvata in `localStorage`, bootstrap in `app/layout.js`).
-- Toggle sole/luna in landing, login, register, dashboard e navbar.
-- **WebSocket** (`/ws`): toast su `iot_update` / `data_update` / errori; icona **Radio** in navbar se connesso; dopo mutazioni REST la UI invia `sendFamilyUpdate` così gli altri client ricevono broadcast e possono rifetchare (stesso tab: niente toast se `userId` coincide).
+- Toggle sole/luna in landing, login, register, navbar.
+- **Menu mobile**: drawer da destra (backdrop, chiusura Esc / tap fuori / cambio rotta); elenco voci scrollabile sopra la bottom nav.
+- **WebSocket** (`/ws`): toast in basso a destra (`z-[46]`, sotto header `z-50`); risorse `shopping`, `pantry`, `deadlines`, `recipes`, `iot`, **`board`**; dopo mutazioni REST si invia `sendFamilyUpdate`; niente toast “altro membro” se `userId` coincide con l’utente in `localStorage`.
 
 ## 🔗 Backend
 

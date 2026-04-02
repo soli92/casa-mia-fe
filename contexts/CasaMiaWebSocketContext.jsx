@@ -23,6 +23,7 @@ const RESOURCE_LABELS = {
   deadlines: 'Scadenze',
   recipes: 'Ricette',
   iot: 'IoT',
+  board: 'Lavagna',
 }
 
 const ACTION_LABELS = {
@@ -36,11 +37,12 @@ const CasaMiaWebSocketContext = createContext({
   sendFamilyUpdate: () => {},
 })
 
+/** z-[46]: sotto header (z-50) e drawer menu (z-48); sopra bottom nav (40). Angolo basso-destra, non copre l’header. */
 function WsToastStack({ toasts, onDismiss }) {
   if (toasts.length === 0) return null
   return (
     <div
-      className="pointer-events-none fixed bottom-4 right-4 z-[100] flex max-w-sm flex-col gap-2 p-2 sm:bottom-6 sm:right-6"
+      className="pointer-events-none fixed bottom-20 right-3 z-[46] flex max-w-sm flex-col gap-2 p-2 md:bottom-6 md:right-6"
       aria-live="polite"
     >
       {toasts.map((t) => (

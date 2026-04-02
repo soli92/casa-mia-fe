@@ -13,4 +13,12 @@ body {
   background: var(--background);
   color: var(--foreground);
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Contenuto sopra la bottom nav su mobile (md+ senza barra) */
+@layer components {
+  .app-main-shell {
+    @apply mx-auto w-full max-w-7xl px-3 py-4 pb-24 sm:px-4 sm:py-6 md:pb-8 lg:px-8;
+  }
 }

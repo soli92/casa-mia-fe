@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/lib/api'
-import { LS_REFRESH_KEY, LS_TOKEN_KEY, LS_USER_KEY } from '@/lib/authSession'
+import { LS_REFRESH_KEY, LS_TOKEN_KEY, persistSession } from '@/lib/authSession'
 import { LogIn, Home } from 'lucide-react'
 import ThemeToggle from '@/components/ThemeToggle'
 
@@ -23,7 +23,7 @@ export default function LoginPage() {
       const data = await login(formData.email, formData.password)
       localStorage.setItem(LS_TOKEN_KEY, data.accessToken)
       localStorage.setItem(LS_REFRESH_KEY, data.refreshToken)
-      localStorage.setItem(LS_USER_KEY, JSON.stringify(data.user))
+      persistSession({ user: data.user, family: data.family })
       router.push('/dashboard')
     } catch (err) {
       console.error('Errore login:', err)

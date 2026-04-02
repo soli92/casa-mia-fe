@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { register } from '@/lib/api'
-import { LS_REFRESH_KEY, LS_TOKEN_KEY, LS_USER_KEY } from '@/lib/authSession'
+import { LS_REFRESH_KEY, LS_TOKEN_KEY, persistSession } from '@/lib/authSession'
 import { UserPlus, Home } from 'lucide-react'
 import ThemeToggle from '@/components/ThemeToggle'
 
@@ -28,7 +28,7 @@ export default function RegisterPage() {
       const data = await register(formData)
       localStorage.setItem(LS_TOKEN_KEY, data.accessToken)
       localStorage.setItem(LS_REFRESH_KEY, data.refreshToken)
-      localStorage.setItem(LS_USER_KEY, JSON.stringify(data.user))
+      persistSession({ user: data.user, family: data.family })
       router.push('/dashboard')
     } catch (err) {
       console.error('Errore registrazione:', err)
