@@ -15,6 +15,7 @@ import {
   Radio,
   Users,
   StickyNote,
+  FileText,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { clearClientSession } from '@/lib/authSession'
@@ -43,6 +44,7 @@ export default function Navbar() {
     { href: '/pantry', icon: Package, label: 'Dispensa' },
     { href: '/recipes', icon: ChefHat, label: 'Ricette' },
     { href: '/deadlines', icon: Calendar, label: 'Scadenze' },
+    { href: '/documenti', icon: FileText, label: 'Documenti' },
     { href: '/iot', icon: Wifi, label: 'IoT' },
   ]
 

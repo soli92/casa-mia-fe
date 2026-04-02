@@ -13,6 +13,7 @@ import {
   Check,
   X,
   StickyNote,
+  FileText,
 } from 'lucide-react'
 import Link from 'next/link'
 import { LS_TOKEN_KEY } from '@/lib/authSession'
@@ -101,6 +102,13 @@ export default function DashboardPage() {
       icon: Calendar,
       href: '/deadlines',
       gradient: 'from-red-500 to-red-700',
+    },
+    {
+      title: 'Documenti',
+      description: 'File condivisi con link CDN (PDF, foto, Office…)',
+      icon: FileText,
+      href: '/documenti',
+      gradient: 'from-slate-500 to-slate-700',
     },
     {
       title: 'IoT',

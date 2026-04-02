@@ -11,6 +11,7 @@ import {
   Wifi,
   StickyNote,
   Users,
+  FileText,
 } from 'lucide-react'
 
 const items = [
@@ -21,6 +22,7 @@ const items = [
   { href: '/pantry', icon: Package, label: 'Dispensa' },
   { href: '/recipes', icon: ChefHat, label: 'Ricette' },
   { href: '/deadlines', icon: Calendar, label: 'Scadenze' },
+  { href: '/documenti', icon: FileText, label: 'Doc' },
   { href: '/iot', icon: Wifi, label: 'IoT' },
 ]
 

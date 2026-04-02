@@ -24,6 +24,7 @@ const RESOURCE_LABELS = {
   recipes: 'Ricette',
   iot: 'IoT',
   board: 'Lavagna',
+  documents: 'Documenti',
 }
 
 const ACTION_LABELS = {
