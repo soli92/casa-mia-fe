@@ -9,6 +9,7 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 - 👨‍🍳 **Ricette suggerite** basate su cosa hai in casa
 - 📅 **Calendario scadenze** (bollette, abbonamenti, tasse)
 - 📝 **Lavagna** (`/lavagna`) — post-it condivisi con la famiglia, trascinamento, colori, sync WebSocket
+- 📄 **Documenti** (`/documenti`) — cartelle per organizzare i file, metadati + riferimento bucket; **apertura in app** con URL GET firmato (PDF/immagini in modale); upload da file o **scansione fotocamera** (`capture="environment"`); link temporaneo copiabile negli appunti
 - 🏠 **Hub IoT** per controllare dispositivi smart home in tempo reale
 - 🔐 **Autenticazione sicura** con JWT + refresh token
 - 👨‍👩‍👧‍👦 **Multi-utente** — stessi dati per tutta la famiglia; **navbar** con nome famiglia; admin può rinominare la famiglia dalla dashboard
@@ -48,6 +49,7 @@ Non sono previsti utenti demo: crea un account da **Registrati** (famiglia + pri
 app/
 ├── dashboard/       # Home + modifica nome famiglia (admin)
 ├── lavagna/         # Lavagna post-it
+├── documenti/       # Documenti famiglia (cartelle, viewer presigned, camera)
 ├── login/           # Login
 ├── register/        # Registrazione
 ├── shopping/        # Lista spesa
@@ -73,7 +75,7 @@ hooks/
 └── useDataUpdateRefresh.js
 
 lib/
-├── api.js          # REST incluso board + PATCH family
+├── api.js          # REST (board, family, documenti: cartelle, presign, commit, access-url, …)
 ├── apiUrl.js
 ├── authSession.js  # token, refresh, user, **family** (`persistSession`)
 └── themeStorage.js
@@ -97,7 +99,7 @@ NEXT_PUBLIC_API_URL=https://casa-mia-be.onrender.com
 - **SoliDS**: variabili `--background`, `--foreground`, `--primary`, ecc.; `data-theme="light"` | `data-theme="dark"` su `<html>` (preferenza salvata in `localStorage`, bootstrap in `app/layout.js`).
 - Toggle sole/luna in landing, login, register, navbar.
 - **Menu mobile**: drawer da destra (backdrop, chiusura Esc / tap fuori / cambio rotta); elenco voci scrollabile sopra la bottom nav.
-- **WebSocket** (`/ws`): toast in basso a destra (`z-[46]`, sotto header `z-50`); risorse `shopping`, `pantry`, `deadlines`, `recipes`, `iot`, **`board`**; dopo mutazioni REST si invia `sendFamilyUpdate`; niente toast “altro membro” se `userId` coincide con l’utente in `localStorage`.
+- **WebSocket** (`/ws`): toast in basso a destra (`z-[46]`, sotto header `z-50`); risorse `shopping`, `pantry`, `deadlines`, `recipes`, `iot`, **`board`**, **`documents`**; dopo mutazioni REST si invia `sendFamilyUpdate`; niente toast “altro membro” se `userId` coincide con l’utente in `localStorage`.
 
 ## 🔗 Backend
 
@@ -124,7 +126,7 @@ docker run -p 3000:3000 casa-mia-fe
 ## 🧪 Testing
 
 ```bash
-npm test           # Vitest (es. lib/apiUrl)
+npm test           # Vitest: `lib/apiUrl.test.js`, `lib/api.documents.test.js`
 npm run test:watch
 npm run lint
 npm run build
