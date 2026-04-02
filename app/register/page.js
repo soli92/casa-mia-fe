@@ -4,15 +4,17 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { register } from '@/lib/api'
+import { LS_REFRESH_KEY, LS_TOKEN_KEY, LS_USER_KEY } from '@/lib/authSession'
 import { UserPlus, Home } from 'lucide-react'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [formData, setFormData] = useState({ 
-    email: '', 
-    password: '', 
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
     name: '',
-    familyName: '' 
+    familyName: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -24,10 +26,9 @@ export default function RegisterPage() {
 
     try {
       const data = await register(formData)
-      // Il backend ritorna accessToken e refreshToken
-      localStorage.setItem('token', data.accessToken)
-      localStorage.setItem('refreshToken', data.refreshToken)
-      localStorage.setItem('user', JSON.stringify(data.user))
+      localStorage.setItem(LS_TOKEN_KEY, data.accessToken)
+      localStorage.setItem(LS_REFRESH_KEY, data.refreshToken)
+      localStorage.setItem(LS_USER_KEY, JSON.stringify(data.user))
       router.push('/dashboard')
     } catch (err) {
       console.error('Errore registrazione:', err)
@@ -38,98 +39,101 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white">
-        <div className="flex items-center justify-center mb-8">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-3 rounded-2xl mr-3">
-            <Home className="w-8 h-8 text-white" />
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
+      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-xl">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="mr-3 rounded-2xl bg-primary p-3">
+            <Home className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-            Casa Mia
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">Casa Mia</h1>
         </div>
-        
-        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Crea il tuo account</h2>
-        
+
+        <h2 className="mb-6 text-center text-2xl font-semibold text-foreground">
+          Crea il tuo account
+        </h2>
+
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 animate-shake">
+          <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive">
             <p className="text-sm font-medium">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nome completo</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Nome completo</label>
             <input
               type="text"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Mario Rossi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nome famiglia</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Nome famiglia</label>
             <input
               type="text"
               required
               value={formData.familyName}
               onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Famiglia Rossi"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Email</label>
             <input
               type="email"
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="mario@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="mb-2 block text-sm font-medium text-foreground">Password</label>
             <input
               type="password"
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full rounded-xl border border-input bg-background px-4 py-3 text-foreground transition-all focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="••••••••"
               minLength={6}
             />
-            <p className="text-xs text-gray-500 mt-1">Minimo 6 caratteri</p>
+            <p className="mt-1 text-xs text-muted-foreground">Minimo 6 caratteri</p>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+            className="flex w-full items-center justify-center rounded-xl bg-primary py-3 font-semibold text-primary-foreground transition-all hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <div className="flex items-center space-x-2">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                 <span>Creazione account...</span>
               </div>
             ) : (
               <>
-                <UserPlus className="w-5 h-5 mr-2" />
+                <UserPlus className="mr-2 h-5 w-5" />
                 Registrati
               </>
             )}
           </button>
         </form>
 
-        <p className="text-center mt-6 text-gray-600">
+        <p className="mt-6 text-center text-muted-foreground">
           Hai già un account?{' '}
-          <Link href="/login" className="text-indigo-600 font-semibold hover:underline hover:text-purple-600 transition-colors">
+          <Link href="/login" className="font-semibold text-primary hover:underline">
             Accedi
           </Link>
         </p>

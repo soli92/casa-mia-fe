@@ -1,7 +1,16 @@
+@import "@soli92/solids/css/index.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--sd-font-body), system-ui, -apple-system, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
 }

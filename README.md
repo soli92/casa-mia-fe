@@ -16,9 +16,9 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 
 - **Next.js 14** (App Router)
 - **React 18**
-- **Tailwind CSS** - Styling moderno e responsive
+- **Tailwind CSS** + preset **[@soli92/solids](https://www.npmjs.com/package/@soli92/solids)** (richiede anche `tailwindcss-animate` in dev, come da preset)
 - **Axios** - API client
-- **Socket.io** - WebSocket per IoT real-time
+- **WebSocket** (`/ws`) — `contexts/CasaMiaWebSocketContext.jsx` (toast, `sendFamilyUpdate`, eventi DOM)
 - **Lucide Icons** - Icone moderne
 - **date-fns** - Gestione date
 
@@ -38,17 +38,7 @@ npm run dev
 
 Apri [http://localhost:3000](http://localhost:3000)
 
-## 🔑 Credenziali di test
-
-Dopo aver avviato il backend, puoi fare login con:
-
-### Admin:
-- **Email**: `mario@rossi.com`
-- **Password**: `demo123`
-
-### Member:
-- **Email**: `lucia@rossi.com`
-- **Password**: `demo123`
+Non sono previsti utenti demo: crea un account da **Registrati** (famiglia + primo admin) oppure usa il backend per altri flussi.
 
 ## 📁 Struttura progetto
 
@@ -57,14 +47,29 @@ app/
 ├── dashboard/       # Home dashboard
 ├── login/          # Login page
 ├── register/       # Registrazione
+├── shopping/       # Lista spesa
 ├── pantry/         # Gestione dispensa
+├── recipes/        # Ricette e suggerimenti
 ├── deadlines/      # Scadenze e calendario
-├── globals.css     # Stili globali
+├── iot/            # Hub IoT
+├── providers.jsx   # Theme + WebSocket context
+├── globals.css     # SoliDS + Tailwind
 └── page.js         # Landing page
 
+components/
+└── ThemeProvider.jsx / ThemeToggle.jsx
+
+contexts/
+└── CasaMiaWebSocketContext.jsx  # WS, toast, sendFamilyUpdate
+
+hooks/
+└── useDataUpdateRefresh.js      # refetch su evento data_update
+
 lib/
-├── api.js          # Axios instance configurata
-└── auth.js         # Utility autenticazione
+├── api.js          # Axios + interceptor JWT / refresh
+├── apiUrl.js       # Base URL API + URL WebSocket (`/ws`)
+├── authSession.js
+└── themeStorage.js # chiave `data-theme` (light | dark)
 ```
 
 ## 🔧 Variabili d'ambiente
@@ -75,18 +80,16 @@ Crea `.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-Per il deploy su Vercel:
+Per il deploy su Vercel (URL del backend di produzione):
 ```env
-NEXT_PUBLIC_API_URL=https://casa-mia-be.railway.app
+NEXT_PUBLIC_API_URL=https://casa-mia-be.onrender.com
 ```
 
 ## 🎨 UI/UX
 
-- Design **responsive** mobile-first
-- **Dark mode** friendly
-- Animazioni fluide
-- Feedback visivo immediato
-- **WebSocket** per aggiornamenti real-time
+- **SoliDS**: variabili `--background`, `--foreground`, `--primary`, ecc.; `data-theme="light"` | `data-theme="dark"` su `<html>` (preferenza salvata in `localStorage`, bootstrap in `app/layout.js`).
+- Toggle sole/luna in landing, login, register, dashboard e navbar.
+- **WebSocket** (`/ws`): toast su `iot_update` / `data_update` / errori; icona **Radio** in navbar se connesso; dopo mutazioni REST la UI invia `sendFamilyUpdate` così gli altri client ricevono broadcast e possono rifetchare (stesso tab: niente toast se `userId` coincide).
 
 ## 🔗 Backend
 
@@ -113,10 +116,9 @@ docker run -p 3000:3000 casa-mia-fe
 ## 🧪 Testing
 
 ```bash
-# Lint
+npm test           # Vitest (es. lib/apiUrl)
+npm run test:watch
 npm run lint
-
-# Build
 npm run build
 ```
 
@@ -124,7 +126,6 @@ npm run build
 
 - [ ] PWA support
 - [ ] Notifiche push
-- [ ] Dark mode toggle
 - [ ] Multi-lingua (i18n)
 - [ ] Import ricette da URL
 - [ ] Scanner barcode per dispensa

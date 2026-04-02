@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, X, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getDeadlines, createDeadline, deleteDeadline } from '@/lib/api'
+import { LS_TOKEN_KEY } from '@/lib/authSession'
 import { format, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns'
 import { it } from 'date-fns/locale'
 import Navbar from '../components/Navbar'
+import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
+import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
 
 const CATEGORIES = [
   { value: 'BOLLETTE', label: 'Bolletta', color: 'bg-blue-500', textColor: 'text-blue-700', bgLight: 'bg-blue-50' },
@@ -14,11 +17,12 @@ const CATEGORIES = [
   { value: 'ASSICURAZIONI', label: 'Assicurazione', color: 'bg-green-500', textColor: 'text-green-700', bgLight: 'bg-green-50' },
   { value: 'ABBONAMENTI', label: 'Abbonamento', color: 'bg-purple-500', textColor: 'text-purple-700', bgLight: 'bg-purple-50' },
   { value: 'AFFITTO', label: 'Affitto', color: 'bg-yellow-500', textColor: 'text-yellow-700', bgLight: 'bg-yellow-50' },
-  { value: 'ALTRO', label: 'Altro', color: 'bg-gray-500', textColor: 'text-gray-700', bgLight: 'bg-gray-50' },
+  { value: 'ALTRO', label: 'Altro', color: 'bg-muted-foreground', textColor: 'text-foreground', bgLight: 'bg-muted' },
 ]
 
 export default function DeadlinesPage() {
   const router = useRouter()
+  const { sendFamilyUpdate } = useCasaMiaWebSocketContext()
   const [deadlines, setDeadlines] = useState([])
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [loading, setLoading] = useState(true)
@@ -31,16 +35,7 @@ export default function DeadlinesPage() {
     description: ''
   })
 
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      router.push('/login')
-      return
-    }
-    loadDeadlines()
-  }, [router])
-
-  const loadDeadlines = async () => {
+  const loadDeadlines = useCallback(async () => {
     try {
       const data = await getDeadlines()
       setDeadlines(data)
@@ -49,12 +44,24 @@ export default function DeadlinesPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const token = localStorage.getItem(LS_TOKEN_KEY)
+    if (!token) {
+      router.push('/login')
+      return
+    }
+    loadDeadlines()
+  }, [router, loadDeadlines])
+
+  useDataUpdateRefresh('deadlines', loadDeadlines)
 
   const handleAdd = async (e) => {
     e.preventDefault()
     try {
       await createDeadline(formData)
+      sendFamilyUpdate('deadlines', 'create', {})
       setFormData({ title: '', dueDate: '', category: 'BOLLETTE', amount: '', description: '' })
       setShowForm(false)
       loadDeadlines()
@@ -68,6 +75,7 @@ export default function DeadlinesPage() {
     if (confirm('Eliminare questa scadenza?')) {
       try {
         await deleteDeadline(id)
+        sendFamilyUpdate('deadlines', 'delete', { id })
         loadDeadlines()
       } catch (error) {
         console.error('Errore eliminazione:', error)
@@ -85,10 +93,10 @@ export default function DeadlinesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-background">
         <Navbar />
         <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="text-xl text-gray-600">Caricamento...</div>
+          <div className="text-xl text-muted-foreground">Caricamento...</div>
         </div>
       </div>
     )
@@ -100,18 +108,18 @@ export default function DeadlinesPage() {
     .slice(0, 5)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Calendario Scadenze 📅</h1>
-            <p className="text-gray-600">Totale scadenze: {deadlines.length}</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">Calendario Scadenze 📅</h1>
+            <p className="text-muted-foreground">Totale scadenze: {deadlines.length}</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            className="flex items-center space-x-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg transition-all hover:scale-105 hover:opacity-95"
           >
             {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             <span className="font-semibold">{showForm ? 'Annulla' : 'Nuova Scadenza'}</span>
@@ -119,36 +127,36 @@ export default function DeadlinesPage() {
         </div>
 
         {showForm && (
-          <form onSubmit={handleAdd} className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-200">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Nuova Scadenza</h3>
+          <form onSubmit={handleAdd} className="bg-card rounded-2xl shadow-lg p-6 mb-8 border border-border">
+            <h3 className="text-xl font-bold text-foreground mb-4">Nuova Scadenza</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Titolo *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Titolo *</label>
                 <input
                   type="text"
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring"
                   placeholder="Es. Bolletta luce"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Data scadenza *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Data scadenza *</label>
                 <input
                   type="date"
                   required
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Categoria *</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Categoria *</label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring"
                 >
                   {CATEGORIES.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -156,22 +164,22 @@ export default function DeadlinesPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Importo (€)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Importo (€)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring"
                   placeholder="Opzionale"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Note</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Note</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-ring"
                   placeholder="Aggiungi dettagli..."
                   rows="3"
                 />
@@ -189,34 +197,34 @@ export default function DeadlinesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Calendar */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+            <div className="bg-card rounded-2xl shadow-lg p-6 border border-border">
               <div className="flex justify-between items-center mb-6">
                 <button
                   onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                  className="p-2 hover:bg-muted rounded-lg transition-all"
                 >
-                  <ChevronLeft className="w-6 h-6 text-gray-600" />
+                  <ChevronLeft className="w-6 h-6 text-muted-foreground" />
                 </button>
-                <h2 className="text-2xl font-bold text-gray-900 capitalize">
+                <h2 className="text-2xl font-bold text-foreground capitalize">
                   {format(currentMonth, 'MMMM yyyy', { locale: it })}
                 </h2>
                 <button
                   onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+                  className="p-2 hover:bg-muted rounded-lg transition-all"
                 >
-                  <ChevronRight className="w-6 h-6 text-gray-600" />
+                  <ChevronRight className="w-6 h-6 text-muted-foreground" />
                 </button>
               </div>
 
               <div className="grid grid-cols-7 gap-2">
                 {['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map(day => (
-                  <div key={day} className="text-center font-semibold text-gray-600 text-sm py-2">
+                  <div key={day} className="text-center font-semibold text-muted-foreground text-sm py-2">
                     {day}
                   </div>
                 ))}
 
                 {Array.from({ length: monthStart.getDay() === 0 ? 6 : monthStart.getDay() - 1 }).map((_, i) => (
-                  <div key={`empty-${i}`} className="h-20 bg-gray-50 rounded-lg" />
+                  <div key={`empty-${i}`} className="h-20 rounded-lg bg-muted/50" />
                 ))}
 
                 {daysInMonth.map(day => {
@@ -227,10 +235,10 @@ export default function DeadlinesPage() {
                     <div
                       key={day.toString()}
                       className={`h-20 border-2 rounded-lg p-2 transition-all ${
-                        isToday ? 'bg-indigo-50 border-indigo-400 shadow-md' : 'bg-white border-gray-200 hover:border-indigo-200'
+                        isToday ? 'border-primary bg-primary/10 shadow-md' : 'border-border bg-card hover:border-primary/30'
                       }`}
                     >
-                      <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-indigo-700' : 'text-gray-700'}`}>
+                      <div className={`mb-1 text-sm font-semibold ${isToday ? 'text-primary' : 'text-foreground'}`}>
                         {format(day, 'd')}
                       </div>
                       <div className="space-y-1">
@@ -247,7 +255,7 @@ export default function DeadlinesPage() {
                           )
                         })}
                         {dayDeadlines.length > 2 && (
-                          <div className="text-xs text-gray-500 font-medium">
+                          <div className="text-xs font-medium text-muted-foreground">
                             +{dayDeadlines.length - 2}
                           </div>
                         )}
@@ -261,14 +269,14 @@ export default function DeadlinesPage() {
 
           {/* Upcoming List */}
           <div>
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+            <div className="bg-card rounded-2xl shadow-lg p-6 border border-border">
               <div className="flex items-center space-x-2 mb-4">
-                <CalendarIcon className="w-6 h-6 text-indigo-600" />
-                <h3 className="text-xl font-bold text-gray-900">Prossime Scadenze</h3>
+                <CalendarIcon className="h-6 w-6 text-primary" />
+                <h3 className="text-xl font-bold text-foreground">Prossime Scadenze</h3>
               </div>
               <div className="space-y-3">
                 {upcomingDeadlines.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">Nessuna scadenza imminente</p>
+                  <p className="py-8 text-center text-muted-foreground">Nessuna scadenza imminente</p>
                 ) : (
                   upcomingDeadlines.map(deadline => {
                     const cat = CATEGORIES.find(c => c.value === deadline.category)
@@ -276,8 +284,8 @@ export default function DeadlinesPage() {
                       <div key={deadline.id} className={`${cat?.bgLight} rounded-xl p-4 border-2 ${cat?.color.replace('bg-', 'border-')} hover:shadow-md transition-all`}>
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex-1">
-                            <h4 className="font-bold text-gray-900 mb-1">{deadline.title}</h4>
-                            <p className="text-sm text-gray-600">
+                            <h4 className="font-bold text-foreground mb-1">{deadline.title}</h4>
+                            <p className="text-sm text-muted-foreground">
                               {format(parseISO(deadline.dueDate), 'dd MMMM yyyy', { locale: it })}
                             </p>
                           </div>
@@ -293,7 +301,7 @@ export default function DeadlinesPage() {
                             {cat?.label}
                           </span>
                           {deadline.amount && (
-                            <span className="text-sm font-bold text-gray-900">€{deadline.amount}</span>
+                            <span className="text-sm font-bold text-foreground">€{deadline.amount}</span>
                           )}
                         </div>
                       </div>
