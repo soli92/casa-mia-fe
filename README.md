@@ -13,6 +13,8 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 - 🏠 **Hub IoT** per controllare dispositivi smart home in tempo reale
 - 🔐 **Autenticazione sicura** con JWT + refresh token
 - 👨‍👩‍👧‍👦 **Multi-utente** — stessi dati per tutta la famiglia; **navbar** con nome famiglia; admin può rinominare la famiglia dalla dashboard
+- 🏠 **Dashboard** (`/dashboard`) — riepilogo **scadenze** (scadute + prossimi 7 giorni) e anteprima **post-it** dalla lavagna; link alle sezioni complete; refresh su eventi WebSocket `deadlines` / `board`
+- 🔔 **Notifiche push scadenze** — opt-in dalla dashboard; service worker `public/sw.js`; richiede backend con VAPID e **HTTPS** in produzione
 - 📱 **Mobile-first** — bottom nav scrollabile, **menu laterale** (drawer) su hamburger; toast realtime sotto la barra superiore (`z-index` non copre l’header)
 
 ## 🛠️ Tech Stack
@@ -46,8 +48,11 @@ Non sono previsti utenti demo: crea un account da **Registrati** (famiglia + pri
 ## 📁 Struttura progetto
 
 ```
+public/
+└── sw.js            # Service worker (push scadenze)
+
 app/
-├── dashboard/       # Home + modifica nome famiglia (admin)
+├── dashboard/       # Home, in evidenza (scadenze + lavagna), push opt-in, griglia moduli (admin: nome famiglia)
 ├── lavagna/         # Lavagna post-it
 ├── documenti/       # Documenti famiglia (cartelle, viewer presigned, camera)
 ├── login/           # Login
@@ -58,8 +63,9 @@ app/
 ├── deadlines/       # Scadenze
 ├── iot/             # Hub IoT
 ├── components/
-│   ├── Navbar.js         # Titolo famiglia, drawer mobile, link desktop
-│   └── MobileBottomNav.js
+│   ├── Navbar.js                # Titolo famiglia, drawer mobile, link desktop
+│   ├── MobileBottomNav.js
+│   └── DashboardPushSettings.jsx  # Attiva/disattiva notifiche push (VAPID)
 ├── providers.jsx    # Theme → SessionProvider → WebSocket
 ├── globals.css      # SoliDS + `.app-main-shell` (padding sopra bottom nav)
 └── page.js          # Landing
@@ -75,7 +81,8 @@ hooks/
 └── useDataUpdateRefresh.js
 
 lib/
-├── api.js          # REST (board, family, documenti: cartelle, presign, commit, access-url, …)
+├── api.js          # REST (board, deadlines upcoming/overdue, push subscribe, documenti, …)
+├── pushClient.js   # VAPID base64url → Uint8Array
 ├── apiUrl.js
 ├── authSession.js  # token, refresh, user, **family** (`persistSession`)
 └── themeStorage.js
@@ -93,6 +100,8 @@ Per il deploy su Vercel (URL del backend di produzione):
 ```env
 NEXT_PUBLIC_API_URL=https://casa-mia-be.onrender.com
 ```
+
+Le **notifiche push** usano lo stesso backend: configura lì le chiavi VAPID. Il browser deve servire l’app su **HTTPS** (su localhost funziona in chiaro).
 
 ## 🎨 UI/UX
 
@@ -134,8 +143,7 @@ npm run build
 
 ## 📝 TODO
 
-- [ ] PWA support
-- [ ] Notifiche push
+- [ ] PWA support (manifest + installabilità oltre allo SW push)
 - [ ] Multi-lingua (i18n)
 - [ ] Import ricette da URL
 - [ ] Scanner barcode per dispensa
