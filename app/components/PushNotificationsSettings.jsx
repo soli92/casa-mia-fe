@@ -9,7 +9,7 @@ import {
 } from '@/lib/api'
 import { pushSupported, urlBase64ToUint8Array } from '@/lib/pushClient'
 
-export default function DashboardPushSettings() {
+export default function PushNotificationsSettings() {
   const [ready, setReady] = useState(false)
   const [supported, setSupported] = useState(false)
   const [serverConfigured, setServerConfigured] = useState(true)

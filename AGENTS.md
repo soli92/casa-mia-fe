@@ -1,6 +1,6 @@
 # AGENTS.md — contesto per assistenti AI
 
-**Aggiornato:** 2026-04-03
+**Aggiornato:** 2026-04-02
 
 ## Progetto
 
@@ -10,7 +10,7 @@
 
 1. **Env** — `cp .env.example .env.local`; `NEXT_PUBLIC_API_URL` punta al backend (es. `http://localhost:3001`). Il client non usa chiavi S3: solo API REST.
 2. **Sessione client** — `lib/authSession.js`: `token`, `refreshToken`, `user`, **`family`** (`persistSession` / `loadStoredSession`); `SessionContext` fa sync con `GET /auth/me`.
-3. **Prima di PR** — `npm test` (`apiUrl`, `api.documents`) · `npm run lint` · `npm run build`.
+3. **Prima di PR** — `npm test` (`apiUrl`, `api.documents`, `openFoodFacts`, `pantryOcr`, `pantryScanHistory`) · `npm run lint` · `npm run build`.
 4. **Non committare** `.env.local` con segreti.
 
 ## Comandi
@@ -27,6 +27,7 @@
 - `app/documenti/page.js` — cartelle, viewer (PDF/immagini), `useDataUpdateRefresh('documents')`
 - `hooks/useDataUpdateRefresh.js` — refetch quando `detail.resource` coincide
 - `lib/api.js` (documenti: cartelle, presign, commit, `getDocumentAccessUrl`, delete) · `lib/apiUrl.js` (`resolveWebSocketUrl`)
+- `app/pantry/page.js` — dispensa; `PantryBarcodeModal` / `PantryOcrModal` (`html5-qrcode`, Tesseract); `lib/openFoodFacts.js`, `lib/pantryOcr.js`, `lib/pantryScanHistory.js`
 - `README.md`
 
 ## Note integrazione

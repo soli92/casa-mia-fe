@@ -5,16 +5,17 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 ## ✨ Features
 
 - 🛒 **Lista della spesa** con categorie e spunta prodotti
-- 🥫 **Dispensa intelligente** con alert scadenze
+- 🥫 **Dispensa intelligente** (`/pantry`) — alert scadenze; **barcode** (fotocamera, `html5-qrcode`) con lookup **Open Food Facts**; **OCR etichetta** (Tesseract.js sul dispositivo) per nome e data di scadenza; storico scansioni in `localStorage`
 - 👨‍🍳 **Ricette suggerite** basate su cosa hai in casa
 - 📅 **Calendario scadenze** (bollette, abbonamenti, tasse)
 - 📝 **Lavagna** (`/lavagna`) — post-it condivisi con la famiglia, trascinamento, colori, sync WebSocket
 - 📄 **Documenti** (`/documenti`) — cartelle per organizzare i file, metadati + riferimento bucket; **apertura in app** con URL GET firmato (PDF/immagini in modale); upload da file o **scansione fotocamera** (`capture="environment"`); link temporaneo copiabile negli appunti
 - 🏠 **Hub IoT** per controllare dispositivi smart home in tempo reale
 - 🔐 **Autenticazione sicura** con JWT + refresh token
-- 👨‍👩‍👧‍👦 **Multi-utente** — stessi dati per tutta la famiglia; **navbar** con nome famiglia; admin può rinominare la famiglia dalla dashboard
-- 🏠 **Dashboard** (`/dashboard`) — riepilogo **scadenze** (scadute + prossimi 7 giorni) e anteprima **post-it** dalla lavagna; link alle sezioni complete; refresh su eventi WebSocket `deadlines` / `board`
-- 🔔 **Notifiche push scadenze** — opt-in dalla dashboard; service worker `public/sw.js`; richiede backend con VAPID e **HTTPS** in produzione
+- 👨‍👩‍👧‍👦 **Multi-utente** — stessi dati per tutta la famiglia; **navbar** con nome famiglia; admin può rinominare la casa da **Famiglia**
+- 🏠 **Dashboard** (`/dashboard`) — riepilogo **scadenze** (link al **dettaglio** `/deadlines/[id]`) e anteprima **post-it**; refresh WebSocket `deadlines` / `board`
+- 👨‍👩‍👧 **Famiglia** (`/famiglia`) — admin: **nome della casa**, codice invito, membri
+- ⚙️ **Impostazioni** (`/impostazioni`) — notifiche push scadenze (`public/sw.js`, VAPID sul backend, **HTTPS** in produzione)
 - 📱 **Mobile-first** — bottom nav scrollabile, **menu laterale** (drawer) su hamburger; toast realtime sotto la barra superiore (`z-index` non copre l’header)
 
 ## 🛠️ Tech Stack
@@ -26,6 +27,7 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 - **WebSocket** (`/ws`) — `contexts/CasaMiaWebSocketContext.jsx` (toast, `sendFamilyUpdate`, eventi DOM)
 - **Lucide Icons** - Icone moderne
 - **date-fns** - Gestione date
+- **html5-qrcode** + **tesseract.js** — scansione barcode e OCR in dispensa (solo client)
 
 ## 🚀 Quick Start
 
@@ -52,20 +54,23 @@ public/
 └── sw.js            # Service worker (push scadenze)
 
 app/
-├── dashboard/       # Home, in evidenza (scadenze + lavagna), push opt-in, griglia moduli (admin: nome famiglia)
+├── dashboard/       # Home, in evidenza, griglia moduli
+├── impostazioni/    # Push notifiche
+├── deadlines/       # Calendario + lista; dettaglio/modifica in `[id]/page.js`
 ├── lavagna/         # Lavagna post-it
 ├── documenti/       # Documenti famiglia (cartelle, viewer presigned, camera)
 ├── login/           # Login
 ├── register/        # Registrazione
 ├── shopping/        # Lista spesa
-├── pantry/          # Dispensa
+├── pantry/          # Dispensa (barcode, OCR, form)
 ├── recipes/         # Ricette
-├── deadlines/       # Scadenze
 ├── iot/             # Hub IoT
 ├── components/
 │   ├── Navbar.js                # Titolo famiglia, drawer mobile, link desktop
 │   ├── MobileBottomNav.js
-│   └── DashboardPushSettings.jsx  # Attiva/disattiva notifiche push (VAPID)
+│   ├── PushNotificationsSettings.jsx
+│   ├── PantryBarcodeModal.jsx   # Scanner EAN/UPC (id univoco + cleanup Strict Mode)
+│   └── PantryOcrModal.jsx
 ├── providers.jsx    # Theme → SessionProvider → WebSocket
 ├── globals.css      # SoliDS + `.app-main-shell` (padding sopra bottom nav)
 └── page.js          # Landing
@@ -81,8 +86,12 @@ hooks/
 └── useDataUpdateRefresh.js
 
 lib/
-├── api.js          # REST (board, deadlines upcoming/overdue, push subscribe, documenti, …)
-├── pushClient.js   # VAPID base64url → Uint8Array
+├── api.js                 # REST (incluso getDeadlineById, push)
+├── deadlineCategories.js  # Categorie allineate al backend
+├── openFoodFacts.js       # Lookup barcode → nome/categoria (API pubblica)
+├── pantryOcr.js           # OCR etichetta (parse scadenza, nome)
+├── pantryScanHistory.js   # Storico scansioni (localStorage)
+├── pushClient.js
 ├── apiUrl.js
 ├── authSession.js  # token, refresh, user, **family** (`persistSession`)
 └── themeStorage.js
@@ -135,18 +144,19 @@ docker run -p 3000:3000 casa-mia-fe
 ## 🧪 Testing
 
 ```bash
-npm test           # Vitest: `lib/apiUrl.test.js`, `lib/api.documents.test.js`
+npm test           # Vitest (`vitest.config.mjs`, env Node): `lib/*.test.js`
 npm run test:watch
 npm run lint
 npm run build
 ```
+
+Suite attuale: `apiUrl`, `api.documents`, **`openFoodFacts`**, **`pantryOcr`** (parse date / nome da OCR), **`pantryScanHistory`**.
 
 ## 📝 TODO
 
 - [ ] PWA support (manifest + installabilità oltre allo SW push)
 - [ ] Multi-lingua (i18n)
 - [ ] Import ricette da URL
-- [ ] Scanner barcode per dispensa
 
 ## 📄 License
 

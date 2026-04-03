@@ -1,27 +1,39 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { X } from 'lucide-react'
-
-const READER_ID = 'pantry-barcode-reader'
 
 /**
  * Modal fullscreen leggero: fotocamera posteriore + lettura barcode EAN/UPC.
  * @param {{ onClose: () => void, onScan: (barcode: string) => void }} props
  */
 export default function PantryBarcodeModal({ onClose, onScan }) {
+  const readerId = `pantry-bc-${useId().replace(/:/g, '')}`
   const [error, setError] = useState('')
   const [starting, setStarting] = useState(true)
   const scannerRef = useRef(null)
   const stoppedRef = useRef(false)
 
   useEffect(() => {
+    let cancelled = false
     stoppedRef.current = false
     let html5
 
     ;(async () => {
       try {
         const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode')
+        if (cancelled) return
+        const el = document.getElementById(readerId)
+        if (!el) {
+          if (!cancelled) {
+            setError(
+              'Impossibile avviare lo scanner. Chiudi e riprova, oppure aggiorna la pagina.'
+            )
+            setStarting(false)
+          }
+          return
+        }
+
         const formats = [
           Html5QrcodeSupportedFormats.EAN_13,
           Html5QrcodeSupportedFormats.EAN_8,
@@ -29,7 +41,11 @@ export default function PantryBarcodeModal({ onClose, onScan }) {
           Html5QrcodeSupportedFormats.UPC_E,
           Html5QrcodeSupportedFormats.CODE_128,
         ]
-        html5 = new Html5Qrcode(READER_ID, { formatsToSupport: formats, verbose: false })
+        html5 = new Html5Qrcode(readerId, { formatsToSupport: formats, verbose: false })
+        if (cancelled) {
+          html5.clear().catch(() => {})
+          return
+        }
         scannerRef.current = html5
 
         await html5.start(
@@ -53,17 +69,31 @@ export default function PantryBarcodeModal({ onClose, onScan }) {
           },
           () => {}
         )
+        if (cancelled) {
+          await html5.stop().catch(() => {})
+          await html5.clear().catch(() => {})
+          scannerRef.current = null
+          return
+        }
         setStarting(false)
       } catch (e) {
         console.error(e)
-        setError(
-          'Impossibile usare la fotocamera. Consenti l’accesso in impostazioni del browser oppure usa HTTPS.'
-        )
-        setStarting(false)
+        if (html5) {
+          await html5.stop().catch(() => {})
+          await html5.clear().catch(() => {})
+        }
+        if (scannerRef.current === html5) scannerRef.current = null
+        if (!cancelled) {
+          setError(
+            'Impossibile usare la fotocamera. Consenti l’accesso in impostazioni del browser oppure usa HTTPS.'
+          )
+          setStarting(false)
+        }
       }
     })()
 
     return () => {
+      cancelled = true
       stoppedRef.current = true
       const h = scannerRef.current
       scannerRef.current = null
@@ -73,7 +103,7 @@ export default function PantryBarcodeModal({ onClose, onScan }) {
           .then(() => h.clear().catch(() => {}))
       }
     }
-  }, [onClose, onScan])
+  }, [readerId, onClose, onScan])
 
   return (
     <div
@@ -101,7 +131,7 @@ export default function PantryBarcodeModal({ onClose, onScan }) {
           <p className="max-w-sm text-center text-sm text-red-200">{error}</p>
         ) : (
           <div
-            id={READER_ID}
+            id={readerId}
             className="w-full max-w-md overflow-hidden rounded-2xl bg-black [&_video]:max-h-[55vh]"
           />
         )}

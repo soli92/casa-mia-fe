@@ -16,6 +16,7 @@ import {
   Users,
   StickyNote,
   FileText,
+  Settings,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { clearClientSession } from '@/lib/authSession'
@@ -46,6 +47,7 @@ export default function Navbar() {
     { href: '/deadlines', icon: Calendar, label: 'Scadenze' },
     { href: '/documenti', icon: FileText, label: 'Documenti' },
     { href: '/iot', icon: Wifi, label: 'IoT' },
+    { href: '/impostazioni', icon: Settings, label: 'Impostazioni' },
   ]
 
   const familyTitle = family?.name?.trim() || 'La tua famiglia'
@@ -95,7 +97,10 @@ export default function Navbar() {
             <div className="hidden items-center gap-1 md:flex md:shrink-0">
               {navItems.map((item) => {
                 const Icon = item.icon
-                const isActive = pathname === item.href
+                const isActive =
+                  item.href === '/deadlines'
+                    ? pathname === '/deadlines' || pathname.startsWith('/deadlines/')
+                    : pathname === item.href
                 return (
                   <Link
                     key={item.href}
@@ -198,7 +203,10 @@ export default function Navbar() {
               <ul className="flex flex-col gap-1">
                 {navItems.map((item) => {
                   const Icon = item.icon
-                  const isActive = pathname === item.href
+                  const isActive =
+                    item.href === '/deadlines'
+                      ? pathname === '/deadlines' || pathname.startsWith('/deadlines/')
+                      : pathname === item.href
                   return (
                     <li key={item.href}>
                       <Link

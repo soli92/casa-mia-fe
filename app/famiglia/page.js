@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Users, Shield, UserCircle, ArrowLeft, UserPlus, Copy, Check } from 'lucide-react'
+import { Users, Shield, UserCircle, ArrowLeft, UserPlus, Copy, Check, Pencil, X as XIcon } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import { LS_TOKEN_KEY } from '@/lib/authSession'
 import { getFamilyMembers, addFamilyMember } from '@/lib/api'
@@ -13,7 +13,7 @@ import { it } from 'date-fns/locale'
 
 export default function FamigliaPage() {
   const router = useRouter()
-  const { user, family, hydrated, refreshSession } = useSession()
+  const { user, family, hydrated, refreshSession, updateFamilyName } = useSession()
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -23,6 +23,10 @@ export default function FamigliaPage() {
   const [addBusy, setAddBusy] = useState(false)
   const [copiedCode, setCopiedCode] = useState(false)
   const inviteRefreshOnce = useRef(false)
+  const [editingFamilyName, setEditingFamilyName] = useState(false)
+  const [familyNameDraft, setFamilyNameDraft] = useState('')
+  const [savingFamilyName, setSavingFamilyName] = useState(false)
+  const [familyNameError, setFamilyNameError] = useState('')
 
   const load = useCallback(async () => {
     setLoadError('')
@@ -53,6 +57,29 @@ export default function FamigliaPage() {
     inviteRefreshOnce.current = true
     refreshSession()
   }, [hydrated, user?.role, family?.inviteCode, refreshSession])
+
+  useEffect(() => {
+    if (family?.name) setFamilyNameDraft(family.name)
+  }, [family?.name])
+
+  const handleSaveFamilyName = async (e) => {
+    e.preventDefault()
+    setFamilyNameError('')
+    const next = familyNameDraft.trim()
+    if (!next) {
+      setFamilyNameError('Inserisci un nome')
+      return
+    }
+    setSavingFamilyName(true)
+    try {
+      await updateFamilyName(next)
+      setEditingFamilyName(false)
+    } catch (err) {
+      setFamilyNameError(err.response?.data?.error || 'Impossibile salvare')
+    } finally {
+      setSavingFamilyName(false)
+    }
+  }
 
   const isAdmin = user?.role === 'ADMIN'
   const inviteCode = family?.inviteCode
@@ -124,6 +151,70 @@ export default function FamigliaPage() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   Membri che condividono spesa, dispensa, lavagna e il resto dell’app.
                 </p>
+
+                {isAdmin && (
+                  <div className="mt-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+                    <h2 className="text-sm font-semibold text-foreground">Nome della casa</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Visibile in alto nell&apos;app e nella dashboard per tutti i membri.
+                    </p>
+                    {!editingFamilyName ? (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="text-base font-medium text-foreground">{family?.name || '—'}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFamilyNameError('')
+                            setFamilyNameDraft(family?.name || '')
+                            setEditingFamilyName(true)
+                          }}
+                          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-sm hover:bg-muted"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Modifica
+                        </button>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleSaveFamilyName} className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+                        <div className="min-w-0 flex-1">
+                          <label htmlFor="fam-name" className="sr-only">
+                            Nome famiglia
+                          </label>
+                          <input
+                            id="fam-name"
+                            value={familyNameDraft}
+                            onChange={(e) => setFamilyNameDraft(e.target.value)}
+                            className="w-full min-h-10 rounded-lg border border-input bg-background px-3 py-2 text-foreground"
+                            maxLength={80}
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={savingFamilyName}
+                            className="min-h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground hover:opacity-95 disabled:opacity-50"
+                          >
+                            Salva
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingFamilyName(false)
+                              setFamilyNameError('')
+                              setFamilyNameDraft(family?.name || '')
+                            }}
+                            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-border px-3 hover:bg-muted"
+                            aria-label="Annulla"
+                          >
+                            <XIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                    {familyNameError && <p className="mt-2 text-sm text-destructive">{familyNameError}</p>}
+                  </div>
+                )}
+
                 {isAdmin && inviteCode && (
                   <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
