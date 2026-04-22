@@ -29,6 +29,7 @@
 - `lib/api.js` (documenti: cartelle, presign, commit, `getDocumentAccessUrl`, delete) · `lib/apiUrl.js` (`resolveWebSocketUrl`)
 - `app/pantry/page.js` — dispensa; `PantryBarcodeModal` / `PantryOcrModal` (`html5-qrcode`, Tesseract); `lib/openFoodFacts.js`, `lib/pantryOcr.js`, `lib/pantryScanHistory.js`
 - `README.md`
+- `AI_LOG.md` — memoria sviluppo AI-assisted (fasi, commit, inferenze)
 
 ## Note integrazione
 
