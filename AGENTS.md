@@ -1,16 +1,16 @@
 # AGENTS.md — contesto per assistenti AI
 
-**Aggiornato:** 2026-04-02
+**Aggiornato:** 2026-04-24
 
 ## Progetto
 
-**Next.js 14** (App Router), **@soli92/solids** (CSS + Tailwind preset), **Axios**, **WebSocket** nativo verso `/ws`. Pagina **`/documenti`**: cartelle, upload (file + fotocamera `capture="environment"`), anteprima con URL firmato da `GET /documents/:id/access-url`.
+**Next.js 14** (App Router), **@soli92/solids ^1.7.0** (CSS + Tailwind preset; font in `app/layout.js`), **Axios**, **WebSocket** nativo verso `/ws`. Pagina **`/documenti`**: cartelle, upload (file + fotocamera `capture="environment"`), anteprima con URL firmato da `GET /documents/:id/access-url`.
 
 ## Checklist
 
 1. **Env** — `cp .env.example .env.local`; `NEXT_PUBLIC_API_URL` punta al backend (es. `http://localhost:3001`). Il client non usa chiavi S3: solo API REST.
 2. **Sessione client** — `lib/authSession.js`: `token`, `refreshToken`, `user`, **`family`** (`persistSession` / `loadStoredSession`); `SessionContext` fa sync con `GET /auth/me`.
-3. **Prima di PR** — `npm test` (`apiUrl`, `api.documents`, `openFoodFacts`, `pantryOcr`, `pantryScanHistory`) · `npm run lint` · `npm run build`.
+3. **Prima di PR** — `npm test` (`apiUrl`, `api.documents`, `openFoodFacts`, `pantryOcr`, `pantryScanHistory`, **`solids-package`**) · `npm run lint` · `npm run build`.
 4. **Non committare** `.env.local` con segreti.
 
 ## Comandi

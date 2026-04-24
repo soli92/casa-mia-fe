@@ -6,7 +6,7 @@ Memoria di sviluppo AI-assisted. Annotazioni sui prompt, decisioni e pattern eme
 
 ## Overview del progetto
 
-Frontend **Next.js** (App Router) per **Casa Mia**: dashboard, dispensa con barcode/OCR, scadenze, documenti, famiglia/inviti, lavagna, WebSocket, notifiche push, tema chiaro/scuro con **@soli92/solids**.
+Frontend **Next.js** (App Router) per **Casa Mia**: dashboard, dispensa con barcode/OCR, scadenze, documenti, famiglia/inviti, lavagna, WebSocket, notifiche push, tema chiaro/scuro con **@soli92/solids ^1.7.0** (font in `app/layout.js`, test `lib/solids-package.test.js`).
 
 **Stack AI usato (inferito; aggiornato 2026-04-22)**: assistenza **IDE/LLM probabile** (commit 🎨 ripetuti, sequenza “Add X page”). **Nessun** merge `cursor/*` in history analizzata. `AGENTS.md` + pattern `.cursor/rules` dell’ecosistema. Nessun SDK AI nel frontend (`package.json`).
 
@@ -90,6 +90,12 @@ Frontend **Next.js** (App Router) per **Casa Mia**: dashboard, dispensa con barc
 
 - **Chiamate pubbliche** (register) non devono forzare Bearer assente (`c9e9d02`).
 - **z-index** di toast vs drawer richiede tuning dopo introduzione drawer mobile (`2c558a7`).
+
+### Fase 4 — Bump @soli92/solids 1.7.0, font stack, test dipendenza (2026-04-24)
+
+**Cosa è stato fatto**: dipendenza **`@soli92/solids` ^1.7.0**; link **Google Fonts** in `app/layout.js`; **`lib/solids-package.test.js`** in Vitest; README / AGENTS / AI_LOG aggiornati.
+
+**Lezioni**: light/dark usano **Inter** nei token — senza font load il rendering diverge da Storybook SoliDS.
 
 ---
 

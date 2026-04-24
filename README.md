@@ -22,7 +22,7 @@ Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 
 - **Next.js 14** (App Router)
 - **React 18**
-- **Tailwind CSS** + preset **[@soli92/solids](https://www.npmjs.com/package/@soli92/solids)** (richiede anche `tailwindcss-animate` in dev, come da preset)
+- **Tailwind CSS** + preset **[@soli92/solids](https://www.npmjs.com/package/@soli92/solids) ^1.7.0** (richiede anche `tailwindcss-animate` in dev, come da preset); **Google Fonts** in `app/layout.js` (SoliDS 1.7)
 - **Axios** - API client
 - **WebSocket** (`/ws`) — `contexts/CasaMiaWebSocketContext.jsx` (toast, `sendFamilyUpdate`, eventi DOM)
 - **Lucide Icons** - Icone moderne
