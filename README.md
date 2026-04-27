@@ -2,6 +2,8 @@
 
 Frontend Next.js per **Casa Mia**, la tua app di gestione domestica completa.
 
+Riferimenti: **[`AGENTS.md`](./AGENTS.md)** · [`AI_LOG.md`](./AI_LOG.md). Soli Prof indicizza la KB: [RAG + webhook `push`](https://github.com/soli92/soli-prof/blob/main/AGENTS.md); i test `npm test` qui restano indipendenti.
+
 ## ✨ Features
 
 - 🛒 **Lista della spesa** con categorie e spunta prodotti

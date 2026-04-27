@@ -1,6 +1,6 @@
 # AGENTS.md — contesto per assistenti AI
 
-**Aggiornato:** 2026-04-24
+**Aggiornato:** 2026-04-27
 
 ## Progetto
 
@@ -37,3 +37,8 @@
 - WebSocket: protocollo allineato al backend (`ws` / `wss` da `NEXT_PUBLIC_API_URL`); dopo mutazioni su documenti inviare `sendFamilyUpdate('documents', ...)`.
 - Refresh: `POST /api/auth/refresh` → `accessToken` / `refreshToken`.
 - Documenti: link di anteprima e “copia link” sono **temporanei** (TTL lato backend); non assumere URL pubblici permanenti sul bucket.
+
+## Integrazione Soli Prof (RAG / webhook)
+
+Questo repository è in **`CORPUS_REPOS`** su [soli-prof](https://github.com/soli92/soli-prof). Un webhook **`push`** verso `https://soli-prof.vercel.app/api/webhooks/github` può attivare re-ingest (HMAC). I test `npm test` del frontend **non** dipendono da quel flusso. Riferimenti: [soli-prof `AGENTS.md`](https://github.com/soli92/soli-prof/blob/main/AGENTS.md).
+
