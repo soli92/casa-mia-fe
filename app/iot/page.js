@@ -8,6 +8,7 @@ import { LS_TOKEN_KEY } from '@/lib/authSession'
 import Navbar from '../components/Navbar'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
+import LogoLoader from '../components/LogoLoader'
 
 const DEVICE_TYPES = [
   { value: 'LIGHT', label: 'Luce' },
@@ -96,7 +97,7 @@ export default function IoTPage() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="flex min-h-[80vh] items-center justify-center">
-          <p className="text-xl text-muted-foreground">Caricamento...</p>
+          <LogoLoader />
         </div>
       </div>
     )

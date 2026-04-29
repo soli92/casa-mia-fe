@@ -24,6 +24,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useSession } from '@/contexts/SessionContext'
 import MobileBottomNav from './MobileBottomNav'
+import SoliLogo from './SoliLogo'
 
 export default function Navbar() {
   const router = useRouter()
@@ -80,9 +81,7 @@ export default function Navbar() {
               href="/dashboard"
               className="flex min-w-0 flex-1 items-center gap-2.5 rounded-xl py-1 pr-2 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring sm:gap-3"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-lg shadow-sm sm:h-11 sm:w-11">
-                <Users className="h-5 w-5 text-primary-foreground sm:h-6 sm:w-6" aria-hidden />
-              </div>
+              <SoliLogo variant="symbol" size="md" className="shrink-0" alt="Soli Casa Mia" />
               <div className="min-w-0 text-left">
                 <p className="truncate text-base font-bold leading-tight text-foreground sm:text-lg">
                   {familyTitle}

@@ -13,6 +13,7 @@ import PantryOcrModal from '../components/PantryOcrModal'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
 import { fetchProductByBarcode } from '@/lib/openFoodFacts'
+import LogoLoader from '../components/LogoLoader'
 import {
   loadPantryScanHistory,
   pushPantryScanHistory,
@@ -156,7 +157,7 @@ export default function PantryPage() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="flex items-center justify-center min-h-[80vh]">
-          <div className="text-xl text-muted-foreground">Caricamento...</div>
+          <LogoLoader />
         </div>
       </div>
     )

@@ -16,6 +16,29 @@ body {
   min-height: 100dvh;
 }
 
+.soli-logo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.soli-logo img {
+  width: auto;
+  height: 100%;
+}
+
+.soli-logo__dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .soli-logo__light {
+  display: none;
+}
+
+:root[data-theme='dark'] .soli-logo__dark {
+  display: block;
+}
+
 /* Contenuto sopra la bottom nav su mobile (md+ senza barra) */
 @layer components {
   .app-main-shell {

@@ -19,12 +19,13 @@ Riferimenti: **[`AGENTS.md`](./AGENTS.md)** · [`AI_LOG.md`](./AI_LOG.md). Soli 
 - 👨‍👩‍👧 **Famiglia** (`/famiglia`) — admin: **nome della casa**, codice invito, membri
 - ⚙️ **Impostazioni** (`/impostazioni`) — notifiche push scadenze (`public/sw.js`, VAPID sul backend, **HTTPS** in produzione)
 - 📱 **Mobile-first** — bottom nav scrollabile, **menu laterale** (drawer) su hamburger; toast realtime sotto la barra superiore (`z-index` non copre l’header)
+- 📲 **PWA base** — `manifest.webmanifest`, icone installazione (192/512 + dark), favicon/app icon e metadata in `app/layout.js`
 
 ## 🛠️ Tech Stack
 
 - **Next.js 14** (App Router)
 - **React 18**
-- **Tailwind CSS** + preset **[@soli92/solids](https://www.npmjs.com/package/@soli92/solids) ^1.7.0** (richiede anche `tailwindcss-animate` in dev, come da preset); **Google Fonts** in `app/layout.js` (SoliDS 1.7)
+- **Tailwind CSS** + preset **[@soli92/solids](https://www.npmjs.com/package/@soli92/solids) ^1.14.1** (richiede anche `tailwindcss-animate` in dev, come da preset); **Google Fonts** in `app/layout.js` (SoliDS 1.14)
 - **Axios** - API client
 - **WebSocket** (`/ws`) — `contexts/CasaMiaWebSocketContext.jsx` (toast, `sendFamilyUpdate`, eventi DOM)
 - **Lucide Icons** - Icone moderne
@@ -53,9 +54,12 @@ Non sono previsti utenti demo: crea un account da **Registrati** (famiglia + pri
 
 ```
 public/
-└── sw.js            # Service worker (push scadenze)
+├── sw.js            # Service worker (push scadenze)
+├── icons/           # Icone PWA (light/dark 192/512)
+└── brand-assets/    # Asset logo Soli (SVG/PNG)
 
 app/
+├── manifest.js       # Web App Manifest (Next Metadata Route)
 ├── dashboard/       # Home, in evidenza, griglia moduli
 ├── impostazioni/    # Push notifiche
 ├── deadlines/       # Calendario + lista; dettaglio/modifica in `[id]/page.js`
@@ -117,6 +121,7 @@ Le **notifiche push** usano lo stesso backend: configura lì le chiavi VAPID. Il
 ## 🎨 UI/UX
 
 - **SoliDS**: variabili `--background`, `--foreground`, `--primary`, ecc.; `data-theme="light"` | `data-theme="dark"` su `<html>` (preferenza salvata in `localStorage`, bootstrap in `app/layout.js`).
+- **Branding Soli**: componenti riusabili `app/components/SoliLogo.jsx` e `app/components/LogoLoader.jsx` con asset in `public/brand-assets/`.
 - Toggle sole/luna in landing, login, register, navbar.
 - **Menu mobile**: drawer da destra (backdrop, chiusura Esc / tap fuori / cambio rotta); elenco voci scrollabile sopra la bottom nav.
 - **WebSocket** (`/ws`): toast in basso a destra (`z-[46]`, sotto header `z-50`); risorse `shopping`, `pantry`, `deadlines`, `recipes`, `iot`, **`board`**, **`documents`**; dopo mutazioni REST si invia `sendFamilyUpdate`; niente toast “altro membro” se `userId` coincide con l’utente in `localStorage`.
@@ -156,7 +161,6 @@ Suite attuale: `apiUrl`, `api.documents`, **`openFoodFacts`**, **`pantryOcr`** (
 
 ## 📝 TODO
 
-- [ ] PWA support (manifest + installabilità oltre allo SW push)
 - [ ] Multi-lingua (i18n)
 - [ ] Import ricette da URL
 

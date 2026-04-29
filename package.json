@@ -11,7 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@soli92/solids": "^1.13.1",
+    "@soli92/solids": "^1.14.1",
     "axios": "^1.6.5",
     "date-fns": "^3.0.6",
     "html5-qrcode": "^2.3.8",

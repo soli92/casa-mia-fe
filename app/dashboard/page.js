@@ -27,6 +27,7 @@ import {
 } from '@/lib/api'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
 import Navbar from '../components/Navbar'
+import LogoLoader from '../components/LogoLoader'
 
 const POSTIT_PREVIEW = {
   amber:
@@ -181,7 +182,7 @@ export default function DashboardPage() {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="app-main-shell flex min-h-[50vh] items-center justify-center">
-          <p className="text-muted-foreground">Caricamento…</p>
+          <LogoLoader />
         </div>
       </div>
     )
@@ -237,7 +238,7 @@ export default function DashboardPage() {
                 </Link>
               </div>
               {hlLoading ? (
-                <p className="text-sm text-muted-foreground">Caricamento…</p>
+                <LogoLoader compact label="Aggiorno scadenze…" />
               ) : deadlinePreview.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-border bg-muted/30 px-3 py-4 text-sm text-muted-foreground">
                   Nessuna scadenza in ritardo o nei prossimi 7 giorni. Ottimo!
@@ -288,7 +289,7 @@ export default function DashboardPage() {
                 </Link>
               </div>
               {hlLoading ? (
-                <p className="text-sm text-muted-foreground">Caricamento…</p>
+                <LogoLoader compact label="Aggiorno lavagna…" />
               ) : postItPreview.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-border bg-muted/30 px-3 py-4 text-sm text-muted-foreground">
                   Nessun post-it. Aggiungine uno dalla lavagna.

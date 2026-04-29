@@ -11,6 +11,7 @@ import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { DEADLINE_CATEGORIES, categoryMeta } from '@/lib/deadlineCategories'
 import { format, parseISO } from 'date-fns'
 import { it } from 'date-fns/locale'
+import LogoLoader from '../../components/LogoLoader'
 
 function dueDateToInputValue(iso) {
   if (!iso) return ''
@@ -121,7 +122,7 @@ export default function DeadlineDetailPage() {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="app-main-shell flex min-h-[40vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-hidden />
+          <LogoLoader />
         </div>
       </div>
     )

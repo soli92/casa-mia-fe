@@ -10,6 +10,7 @@ import { getFamilyMembers, addFamilyMember } from '@/lib/api'
 import { useSession } from '@/contexts/SessionContext'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale'
+import LogoLoader from '../components/LogoLoader'
 
 export default function FamigliaPage() {
   const router = useRouter()
@@ -123,7 +124,7 @@ export default function FamigliaPage() {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="app-main-shell flex min-h-[50vh] items-center justify-center">
-          <p className="text-muted-foreground">Caricamento…</p>
+          <LogoLoader />
         </div>
       </div>
     )

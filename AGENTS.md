@@ -1,10 +1,10 @@
 # AGENTS.md — contesto per assistenti AI
 
-**Aggiornato:** 2026-04-27
+**Aggiornato:** 2026-04-29
 
 ## Progetto
 
-**Next.js 14** (App Router), **@soli92/solids ^1.7.0** (CSS + Tailwind preset; font in `app/layout.js`), **Axios**, **WebSocket** nativo verso `/ws`. Pagina **`/documenti`**: cartelle, upload (file + fotocamera `capture="environment"`), anteprima con URL firmato da `GET /documents/:id/access-url`.
+**Next.js 14** (App Router), **@soli92/solids ^1.14.1** (CSS + Tailwind preset; font in `app/layout.js`), **Axios**, **WebSocket** nativo verso `/ws`. Branding Soli aggiornato (`app/components/SoliLogo.jsx`, `LogoLoader.jsx`). Base PWA attiva (`app/manifest.js`, metadata icone in `app/layout.js`, asset in `public/icons/`).
 
 ## Checklist
 

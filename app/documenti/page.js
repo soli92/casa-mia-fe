@@ -33,6 +33,7 @@ import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
 import { format } from 'date-fns'
 import { it } from 'date-fns/locale'
+import LogoLoader from '../components/LogoLoader'
 
 function formatBytes(n) {
   const x = Number(n)
@@ -275,7 +276,7 @@ export default function DocumentiPage() {
       <div className="min-h-dvh bg-background">
         <Navbar />
         <div className="app-main-shell flex min-h-[50vh] items-center justify-center">
-          <p className="text-muted-foreground">Caricamento…</p>
+          <LogoLoader />
         </div>
       </div>
     )

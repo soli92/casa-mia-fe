@@ -12,8 +12,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
+      icon: '/favicon.png',
+      badge: '/favicon.png',
       data: { url },
       tag: 'casa-mia-deadlines',
       renotify: true,

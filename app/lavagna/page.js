@@ -19,6 +19,7 @@ import {
 } from '@/lib/api'
 import { useCasaMiaWebSocketContext } from '@/contexts/CasaMiaWebSocketContext'
 import { useDataUpdateRefresh } from '@/hooks/useDataUpdateRefresh'
+import LogoLoader from '../components/LogoLoader'
 
 const COLORS = [
   { id: 'amber', label: 'Giallo' },
@@ -242,7 +243,7 @@ export default function LavagnaPage() {
         >
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-              Caricamento lavagna…
+              <LogoLoader compact label="Caricamento lavagna…" />
             </div>
           )}
 
