@@ -19,3 +19,11 @@ Memoria di sviluppo AI-assisted. Annotazioni sui prompt, decisioni e pattern eme
 - Aggiornata documentazione operativa (`README.md`, `AGENTS.md`) in coerenza con versione SoliDS e stato migrazione.
 
 ---
+
+---
+
+## Aggiornamento 2026-05-06 — LLM Wiki context refinement
+
+- Aggiornati `docs/wiki/wiki/index.md` e `docs/wiki/wiki/log.md` per allineare il wiki al contesto reale del repository.
+- Snapshot iniziale e pagine top-level resi coerenti con `AGENTS.md`, `README.md` e questo `AI_LOG.md`.
+- Nessun ingest di sorgenti effettuato: aggiornamento solo strutturale/documentale.
