@@ -3,3 +3,19 @@ node_modules
 .env
 .env.local
 .vercel
+
+# LLM Wiki template
+# Obsidian
+.obsidian/workspace*
+.obsidian/cache
+.obsidian/graph.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+
+# Note: raw/ is intentionally NOT ignored. Sources are part of ground truth.
